@@ -1,0 +1,54 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model UserProfile {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  email       String    @unique
+  username    String?   @unique
+  fullName    String?
+  avatarUrl   String?
+  phone       String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  addresses   Address[]
+
+  @@map("user_profiles")
+}
+
+model Address {
+  id            String      @id @default(uuid())
+  profileId     String
+  
+  receiverName  String
+  receiverPhone String
+  
+  street        String      // Số nhà, tên đường
+  ward          String      // Phường/Xã
+  district      String      // Quận/Huyện
+  city          String      // Tỉnh/Thành phố
+  
+  isDefault     Boolean     @default(false)
+  type          AddressType @default(HOME)
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  profile       UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+enum AddressType {
+  HOME
+  OFFICE
+  OTHER
+}
