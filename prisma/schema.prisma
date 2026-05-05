@@ -7,6 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AddressType {
+  HOME
+  OFFICE
+  OTHER
+}
+
 model UserProfile {
   id          String    @id @default(uuid())
   userId      String    @unique
@@ -47,8 +53,10 @@ model Address {
   @@map("addresses")
 }
 
-enum AddressType {
-  HOME
-  OFFICE
-  OTHER
+model ProcessedEvent {
+  eventId     String   @id 
+  subject     String
+  processedAt DateTime @default(now())
+
+  @@map("processed_events")
 }
