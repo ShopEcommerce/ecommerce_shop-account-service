@@ -6,7 +6,10 @@ export const updateProfileSchema = z.object({
     username: z.string().min(3, 'Username must be at least 3 characters').optional(),
     fullName: z.string().min(2, 'Full name must be at least 2 characters').optional(),
     avatarUrl: z.string().url('Invalid URL format').optional(),
-    phone: z.string().regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Invalid Vietnamese phone number').optional(),
+    phone: z
+      .string()
+      .regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Invalid Vietnamese phone number')
+      .optional(),
   }),
 });
 
@@ -14,7 +17,9 @@ export const updateProfileSchema = z.object({
 export const createAddressSchema = z.object({
   body: z.object({
     receiverName: z.string({ error: 'Receiver name is required' }).min(2),
-    receiverPhone: z.string({ error: 'Receiver phone is required' }).regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Invalid phone number'),
+    receiverPhone: z
+      .string({ error: 'Receiver phone is required' })
+      .regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Invalid phone number'),
     street: z.string({ error: 'Street is required' }).min(5),
     ward: z.string({ error: 'Ward is required' }),
     district: z.string({ error: 'District is required' }),
@@ -25,7 +30,7 @@ export const createAddressSchema = z.object({
 });
 
 export const updateAddressSchema = z.object({
-  body: createAddressSchema.shape.body.partial(), 
+  body: createAddressSchema.shape.body.partial(),
 });
 
 // Export types cho Controller
