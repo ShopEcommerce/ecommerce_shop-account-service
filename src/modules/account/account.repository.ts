@@ -1,5 +1,5 @@
-import { prisma } from "../../db/prisma";
-import { Prisma } from "@prisma/client";
+import { prisma } from '../../db/prisma';
+import { Prisma } from '@prisma/client';
 
 export class AccountRepository {
   // --- PROFILE ---
@@ -10,10 +10,7 @@ export class AccountRepository {
     });
   }
 
-  static async updateProfile(
-    userId: string,
-    data: Prisma.UserProfileUpdateInput,
-  ) {
+  static async updateProfile(userId: string, data: Prisma.UserProfileUpdateInput) {
     return prisma.userProfile.update({
       where: { userId },
       data,
@@ -25,10 +22,7 @@ export class AccountRepository {
     return prisma.address.create({ data });
   }
 
-  static async updateAddress(
-    addressId: string,
-    data: Prisma.AddressUpdateInput,
-  ) {
+  static async updateAddress(addressId: string, data: Prisma.AddressUpdateInput) {
     return prisma.address.update({
       where: { id: addressId },
       data,

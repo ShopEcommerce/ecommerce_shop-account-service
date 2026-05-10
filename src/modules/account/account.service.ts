@@ -1,10 +1,6 @@
-import { AccountRepository } from "./account.repository";
-import { NotFoundError, BadRequestError } from "@teleshop/common";
-import {
-  CreateAddressInput,
-  UpdateProfileInput,
-  UpdateAddressInput,
-} from "./account.schema";
+import { AccountRepository } from './account.repository';
+import { NotFoundError, BadRequestError } from '@teleshop/common';
+import { CreateAddressInput, UpdateProfileInput, UpdateAddressInput } from './account.schema';
 
 export class AccountService {
   // --- PROFILE LOGIC ---
@@ -35,11 +31,7 @@ export class AccountService {
     });
   }
 
-  static async updateAddress(
-    userId: string,
-    addressId: string,
-    data: UpdateAddressInput,
-  ) {
+  static async updateAddress(userId: string, addressId: string, data: UpdateAddressInput) {
     const profile = await this.getProfile(userId);
     const address = await AccountRepository.findAddressById(addressId);
 
@@ -52,7 +44,7 @@ export class AccountService {
       await AccountRepository.unsetAllDefaultAddresses(profile.id);
     } else if (data.isDefault === false && address.isDefault) {
       throw new BadRequestError(
-        "Cannot unset default address without setting another one as default. Please set another address as default first.",
+        'Cannot unset default address without setting another one as default. Please set another address as default first.',
       );
     }
 
@@ -69,7 +61,7 @@ export class AccountService {
 
     if (address.isDefault) {
       throw new BadRequestError(
-        "Cannot delete default address. Please set another address as default first.",
+        'Cannot delete default address. Please set another address as default first.',
       );
     }
 
