@@ -1,6 +1,9 @@
 import { AccountRepository } from './account.repository';
 import { NotFoundError, BadRequestError } from '@teleshop/common';
 import { CreateAddressInput, UpdateProfileInput, UpdateAddressInput } from './account.schema';
+import { AccountMessages } from '../../helpers/messages';
+
+const MAX_ADDRESSES_PER_USER = 5;
 
 export class AccountService {
   // --- PROFILE LOGIC ---
@@ -19,9 +22,17 @@ export class AccountService {
   static async createAddress(userId: string, data: CreateAddressInput) {
     const profile = await this.getProfile(userId);
 
+    // Enforce maximum addresses limit
+    if (profile.addresses.length >= MAX_ADDRESSES_PER_USER) {
+      throw new BadRequestError(
+        `Cannot add more addresses. Maximum allowed is ${MAX_ADDRESSES_PER_USER} addresses per user.`,
+      );
+    }
+
     if (data.isDefault) {
       await AccountRepository.unsetAllDefaultAddresses(profile.id);
     } else if (profile.addresses.length === 0) {
+      // First address must be default
       data.isDefault = true;
     }
 
@@ -43,9 +54,7 @@ export class AccountService {
     if (data.isDefault && !address.isDefault) {
       await AccountRepository.unsetAllDefaultAddresses(profile.id);
     } else if (data.isDefault === false && address.isDefault) {
-      throw new BadRequestError(
-        'Cannot unset default address without setting another one as default. Please set another address as default first.',
-      );
+      throw new BadRequestError(AccountMessages.MSG_24.message);
     }
 
     return AccountRepository.updateAddress(addressId, data);
@@ -60,11 +69,8 @@ export class AccountService {
     }
 
     if (address.isDefault) {
-      throw new BadRequestError(
-        'Cannot delete default address. Please set another address as default first.',
-      );
+      throw new BadRequestError(AccountMessages.MSG_25.message);
     }
-
     await AccountRepository.deleteAddress(addressId);
   }
 }
