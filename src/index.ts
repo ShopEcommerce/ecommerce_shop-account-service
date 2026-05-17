@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { app } from './app';
 import { rabbitmqWrapper } from '@teleshop/common';
 import pino from 'pino';
-import { UserRegisteredListener } from './events/listeners/user-registered-listener';
+import { UserVerifiedListener } from './events/listeners/user-verified-listener';
 
 const logger = pino();
 
@@ -20,7 +20,7 @@ const start = async () => {
   try {
     await rabbitmqWrapper.connect(process.env.RABBITMQ_URL);
 
-    new UserRegisteredListener(rabbitmqWrapper.channel).listen();
+    new UserVerifiedListener(rabbitmqWrapper.channel).listen();
 
     // Graceful Shutdown
     process.on('SIGINT', () => rabbitmqWrapper.close());
