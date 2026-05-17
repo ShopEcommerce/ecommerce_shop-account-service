@@ -1,22 +1,22 @@
 import { Message } from 'amqplib';
-import { BaseListener, Subjects, UserRegisteredEvent, QueueGroupNames } from '@teleshop/common';
+import { BaseListener, Subjects, UserVerifiedEvent, QueueGroupNames } from '@teleshop/common';
 import { AccountRepository } from '../../modules/account/account.repository';
 import pino from 'pino';
 
-const logger = pino({ name: 'Account-UserRegisteredListener' });
+const logger = pino({ name: 'Account-UserVerifiedListener' });
 
-export class UserRegisteredListener extends BaseListener<UserRegisteredEvent> {
-  subject: Subjects.UserRegistered = Subjects.UserRegistered;
+export class UserVerifiedListener extends BaseListener<UserVerifiedEvent> {
+  subject: Subjects.UserVerified = Subjects.UserVerified;
 
   queueGroupName = QueueGroupNames.AccountService;
 
-  async onMessage(data: UserRegisteredEvent['data'], _msg: Message) {
+  async onMessage(data: UserVerifiedEvent['data'], _msg: Message) {
     const eventId = data.id;
     const correlationId = data.correlationId || 'N/A';
 
     logger.info(
-      { correlationId, eventId, userId: data.id, email: data.email },
-      'Account Service received UserRegistered event',
+      { correlationId, eventId, userId: data.userId, email: data.email },
+      'Account Service received UserVerified event',
     );
 
     try {
@@ -28,13 +28,13 @@ export class UserRegisteredListener extends BaseListener<UserRegisteredEvent> {
       });
 
       logger.info(
-        { correlationId, eventId, userId: data.id },
+        { correlationId, eventId, userId: data.userId },
         'Successfully created User Profile and marked event as processed.',
       );
     } catch (error: any) {
       logger.error(
         { correlationId, eventId, reason: error.message },
-        'Failed to process UserRegistered event',
+        'Failed to process UserVerified event',
       );
       throw error;
     }
