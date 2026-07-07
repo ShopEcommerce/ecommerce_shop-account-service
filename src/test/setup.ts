@@ -1,6 +1,7 @@
 process.env.JWT_SECRET = 'test-secret-key-for-jest';
 process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/account_db?schema=public';
 process.env.RABBITMQ_URL = 'amqp://guest:guest@localhost:5672';
+import { closePrisma } from '../db/prisma';
 
 jest.mock('@teleshop/common', () => {
   const originalModule = jest.requireActual('@teleshop/common');
@@ -18,4 +19,8 @@ jest.mock('@teleshop/common', () => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+});
+
+afterAll(async () => {
+  await closePrisma();
 });

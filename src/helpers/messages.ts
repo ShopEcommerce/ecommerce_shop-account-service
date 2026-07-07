@@ -121,46 +121,4 @@ export class AccountMessages {
   static buildSuccessResponse(message: MessageDefinition, data?: any) {
     return this.buildResponse(true, message, data);
   }
-
-  static buildErrorResponse(message: MessageDefinition) {
-    return this.buildResponse(false, message);
-  }
-}
-
-export class MessageValidator {
-  static validateUsername(username?: string): MessageDefinition | null {
-    if (!username || username.trim().length < 3) {
-      return AccountMessages.MSG_17;
-    }
-    return null;
-  }
-
-  static validateFullName(fullName?: string): MessageDefinition | null {
-    if (!fullName || fullName.trim().length < 2) {
-      return AccountMessages.MSG_18;
-    }
-    return null;
-  }
-
-  static validatePhone(phone?: string): MessageDefinition | null {
-    if (!phone) return null;
-    const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
-    if (!phoneRegex.test(phone)) {
-      return AccountMessages.MSG_19;
-    }
-    return null;
-  }
-
-  static validateRequiredFields(fields: Record<string, any>): MessageDefinition | null {
-    for (const [_key, value] of Object.entries(fields)) {
-      if (
-        value === null ||
-        value === undefined ||
-        (typeof value === 'string' && value.trim() === '')
-      ) {
-        return AccountMessages.MSG_16;
-      }
-    }
-    return null;
-  }
 }

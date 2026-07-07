@@ -88,7 +88,7 @@ describe('Account API Endpoints', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.code).toBe('MSG_20');
+      expect(response.body.code).toBe('MSG_27');
       expect(response.body.data.profile).toBeDefined();
       expect(response.body.data.profile.email).toBe('test@example.com');
     });
@@ -97,7 +97,7 @@ describe('Account API Endpoints', () => {
       const response = await createAuthenticatedRequest('get', '/api/account/profile/me');
 
       expect(response.status).toBe(404);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toEqual([{ message: 'User profile not found' }]);
     });
   });
 
@@ -139,7 +139,9 @@ describe('Account API Endpoints', () => {
       );
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toEqual([
+        { message: 'Invalid Vietnamese phone number', field: 'phone' },
+      ]);
     });
 
     it('should reject username with less than 3 characters', async () => {
@@ -152,7 +154,9 @@ describe('Account API Endpoints', () => {
       );
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toEqual([
+        { message: 'Username must be at least 3 characters', field: 'username' },
+      ]);
     });
 
     it('should reject fullName with less than 2 characters', async () => {
@@ -165,7 +169,9 @@ describe('Account API Endpoints', () => {
       );
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toEqual([
+        { message: 'Full name must be at least 2 characters', field: 'fullName' },
+      ]);
     });
   });
 
@@ -271,7 +277,9 @@ describe('Account API Endpoints', () => {
       );
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toEqual([
+        { message: 'Cannot add more addresses. Maximum allowed is 5 addresses per user.' },
+      ]);
     });
 
     it('should unset previous default when creating new default address', async () => {
@@ -397,7 +405,9 @@ describe('Account API Endpoints', () => {
       ).send(updateData);
 
       expect(response.status).toBe(400);
-      expect(response.body.code).toBe('MSG_24');
+      expect(response.body).toEqual([
+        { message: 'Cannot unset default address without setting another one as default' },
+      ]);
     });
 
     it('should allow changing default address', async () => {
@@ -504,7 +514,9 @@ describe('Account API Endpoints', () => {
       );
 
       expect(response.status).toBe(400);
-      expect(response.body.code).toBe('MSG_25');
+      expect(response.body).toEqual([
+        { message: 'Cannot delete default address. Please set another address as default first' },
+      ]);
 
       // Verify address still exists
       const existingAddress = await prisma.address.findUnique({
@@ -524,7 +536,7 @@ describe('Account API Endpoints', () => {
   });
 
   describe('Idempotency Tests', () => {
-    it('should handle duplicate UserRegistered events gracefully', async () => {
+    it('should handle duplicate UserVerified events gracefully', async () => {
       const eventData = {
         id: 'duplicate-event-id-' + Date.now(),
         userId: 'new-user-456',
@@ -536,7 +548,7 @@ describe('Account API Endpoints', () => {
       const firstProcess = await prisma.processedEvent.create({
         data: {
           eventId: eventData.id,
-          subject: 'user.registered',
+          subject: 'user.verified',
         },
       });
 
