@@ -9,7 +9,7 @@ export class AccountService {
   // --- PROFILE LOGIC ---
   static async getProfile(userId: string) {
     const profile = await AccountRepository.findProfileByUserId(userId);
-    if (!profile) throw new NotFoundError();
+    if (!profile) throw new NotFoundError(AccountMessages.MSG_26.message);
     return profile;
   }
 

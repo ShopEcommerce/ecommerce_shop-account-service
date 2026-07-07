@@ -11,40 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout account-service
-        uses: actions/checkout@v3
-        with:
-          path: account-service
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Checkout shared repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ShopEcommerce/ecommerce_shop-shared
           path: shared
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '22.x'
           cache: 'npm'
-          cache-dependency-path: 'account-service/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Build Shared Library
         run: |
           cd shared
-          npm install
+          npm install --cache .npm-cache
           npm run build
-          npm pack
+          npm pack --cache .npm-cache
 
       - name: Install Dependencies
         run: |
-          cd account-service
-          npm install ../shared/teleshop-common-1.0.0.tgz
-          npm install
+          npm install ./shared/teleshop-common-1.0.4.tgz --cache .npm-cache
+          npm install --cache .npm-cache
 
       - name: Generate Prisma Client
         run: |
-          cd account-service
           npx prisma generate
 
       - name: Setup Postgres for tests
@@ -60,15 +56,14 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/account_db?schema=public
         run: |
-          cd account-service
-          npx prisma migrate deploy
+          npm run prisma:migrate:deploy
 
       - name: Run Linter
         run: |
-          cd account-service
           npm run lint
 
-      - name: Run Unit Tests
+      - name: Run Integration Tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/account_db?schema=public
         run: |
-          cd account-service
           npm run test:ci
